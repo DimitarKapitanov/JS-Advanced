@@ -35,38 +35,43 @@ class SmartHike {
     }
 
     rest(time) {
-        if ((this.resources += (time * 10)) >= 100) {
+        this.resources += time * 10;
+        if (this.resources >= 100) {
             this.resources = 100;
             return `Your resources are fully recharged. Time for hiking!`;
+        } else {
+            return `You have rested for ${time} hours and gained ${time * 10
+                }% resources`;
         }
-        this.resources += (time * 10);
-
-        return `You have rested for ${time} hours and gained ${time * 10}% resources`;
     }
 
     showRecord(criteria) {
-        if (this.listOfHikes.length === 0) {
+        if (this.listOfHikes.length == 0) {
             return `${this.username} has not done any hiking yet`;
         }
 
-        if (criteria === 'all') {
-            let result = 'All hiking records:\n';
-            for (const e of this.listOfHikes) {
-                result += `${this.username} hiked ${e.peak} for ${e.time} hours\n`;
+        if (criteria === "hard" || criteria === "easy") {
+            let allHikes = this.listOfHikes.filter(
+                (hike) => hike.difficultyLevel === criteria
+            );
+            let sortedHikes = allHikes.sort((a, b) => a.time - b.time);
+            let bestHike = sortedHikes[0];
+
+            if (bestHike === undefined) {
+                return `${this.username} has not done any ${criteria} hiking yet`;
             }
-            return result.trim();
+
+            return `${this.username}'s best ${criteria} hike is ${bestHike.peak} peak, for ${bestHike.time} hours`;
+        } else if (criteria === "all") {
+            let result = ["All hiking records:"];
+            this.listOfHikes.forEach((hike) => {
+                result.push(
+                    `${this.username} hiked ${hike.peak} for ${hike.time} hours`
+                );
+            });
+
+            return result.join("\n");
         }
-
-        let temp = this.listOfHikes.find(e => e.difficultyLevel === criteria);
-
-        if (temp === undefined) {
-            return `${this.username} has not done any ${criteria} hiking yet`;
-        }
-
-        let curBest = this.listOfHikes.reduce(function(prev, curr) {
-            return prev.time < curr.time ? prev : curr;
-        });
-        return `${this.username}'s best ${criteria} hike is ${curBest.peak} peak, for ${curBest.time} hours`
     }
 }
 
